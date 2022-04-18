@@ -1,0 +1,85 @@
+<div class="main-wrapper container-fluid m-0 p-0">
+    <mat-toolbar class="app-header">
+      <div class="header-parent">
+          <div class="sub-head1">
+            Blood DonorHub  <mat-icon class="f-31 blood-color">water_drop</mat-icon>
+          </div>
+          
+          <div class="sub-head2">
+            <span matPrefix>
+              <mat-icon class="custom-search-mat-icon" matPrefix>search</mat-icon>
+            </span>
+            <input type="text" matInput class="search-input" (keyup)="applyFilter($event)" placeholder="Search..."/> 
+            <button mat-raised-button class="search-btn mr-2" color="primary">Search</button>
+            <button *ngIf="!loggedIn || loggedIn=='false'" mat-raised-button class="search-btn mr-2" (click)="navigateToRegister()" color="primary">Register</button>
+            <button *ngIf="!loggedIn || loggedIn=='false'" mat-raised-button class="search-btn mr-2" (click)="navigateToLogin()" color="primary">Login</button>
+
+            
+            <button *ngIf="loggedIn=='true'" mat-raised-button class="search-btn mr-2" (click)="displayDonorsData()" color="primary">Donors</button>
+            <button *ngIf="loggedIn=='true'" mat-raised-button class="search-btn mr-2" (click)="displayRequesterData()" color="primary">Requester</button>
+            <button *ngIf="loggedIn=='true'" mat-raised-button class="search-btn mr-2" (click)="logout()" color="primary">Logout</button>
+
+          </div>
+      </div>        
+    </mat-toolbar>
+
+
+    <div class="page-header mt-4">
+        <div *ngIf="tableAction=='requester'" class="f-500 f-30 head-text-color mb-4">
+            Requests
+        </div>
+
+        <div *ngIf="tableAction=='donors'" class="f-500 f-30 head-text-color mb-4">
+          Donor Details
+        </div>
+
+        <mat-divider class="mt-3"></mat-divider>
+    
+        <div>
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+                <ng-container *ngFor="let donor of displayedColumns">
+                  
+                  <ng-container *ngIf="donor!='action'">
+                    <ng-container  matColumnDef="{{donor}}">
+                      <ng-container *ngIf="donor=='requesterId'">
+                        <th  mat-header-cell *matHeaderCellDef style="text-transform: capitalize;"> Email </th>
+                      </ng-container>
+                      <ng-container *ngIf="donor=='requesterName'">
+                        <th  mat-header-cell *matHeaderCellDef style="text-transform: capitalize;"> Name </th>
+                      </ng-container>
+                      <ng-container *ngIf="donor!=='requesterName' && donor!=='requesterId'">
+                        <th mat-header-cell *matHeaderCellDef style="text-transform: capitalize;"> {{donor}} </th>
+                      </ng-container>
+                      <td mat-cell *matCellDef="let element"> {{element[donor]}} </td>
+                    </ng-container>
+                  </ng-container>
+                  
+
+                  <ng-container *ngIf="loggedIn=='true' && donor=='action'">
+                    <ng-container  matColumnDef="action">
+                      <th mat-header-cell *matHeaderCellDef style="text-transform: capitalize;"> Action </th>
+                      <td mat-cell *matCellDef="let element"> 
+                        <button *ngIf="tableAction=='requester'" mat-raised-button class="mr-2 outline-color" (click)="updateRequestStatus('approved',element)" >Approve</button>
+                        <button *ngIf="tableAction=='requester'" mat-raised-button  class="outline-color" (click)="updateRequestStatus('rejected',element)" >Reject</button> 
+                        <button *ngIf="tableAction=='donors'" mat-raised-button  class="outline-color" (click)="navigateToRequest(element?.email)" >Request</button>  
+                      </td>
+                    </ng-container>
+                  </ng-container>
+
+                </ng-container>
+
+                
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                <!-- Row shown when there is no matching data. -->
+                <tr class="mat-row" *matNoDataRow>
+                  <td *ngIf="tableAction=='donors'" class="mat-cell" colspan="7">Donors not available </td>
+                  <td *ngIf="tableAction=='requester'" class="mat-cell" colspan="7">No pending requests </td>
+                </tr>
+              </table>
+              
+        </div>
+    <div>
+</div>

@@ -1,0 +1,6 @@
+version: "3.9"
+services:
+  frontend:
+    image: "anitakumari21/ec2-frontend"
+    ports:
+      - "80:80"

@@ -1,0 +1,196 @@
+/* You can add global styles to this file, and also import other style files */
+* {
+    padding:0;
+    margin:0;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.mat-raised-button.mat-primary{
+    background-color: #383f51;
+}
+
+
+.mat-drawer-container {
+    background-color: #ffff;
+    color: #383f51;
+}
+
+.example-container {
+    width: 500px;
+    height: 300px;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+  }
+  
+  .example-sidenav-content {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .example-sidenav {
+    padding: 20px;
+  }
+
+  .main-body-content{
+    height: 90vh;
+  }
+
+  .main-wrapper{
+    height: 100vh;
+  }
+
+  button:focus {
+   outline:none;
+} 
+
+.app-sidenav{
+  width: 18%;
+}
+
+.search-input{
+  border-radius: 0% !important;
+  margin-right: 8% !important;
+  border-radius: 15px !important;
+  border: 1px #383f51 solid !important;
+  width: 100% !important;
+  font-size: 14px !important;
+  padding-left: 36px !important;
+  outline: none !important;
+}
+
+.custom-search-mat-icon{
+  position: absolute;
+  top:2.5%;
+  left: 21%;
+  color: #383f51;
+}
+
+.shopping_cart{
+  font-size: 52px;
+  position: absolute;
+  color: #3c4f76;
+  top: 6px;
+  right: 124px;
+  /* right: -550px; */
+}
+
+.card-parent{
+  margin-left: 13%;
+}
+
+.search-btn{
+  width:20%;
+  margin-right:3%;
+}
+
+.sub-head2{
+  width:40%;
+}
+
+.sub-head1{
+  width: 20%;
+  padding-left: 2%;
+  display: flex;
+}
+
+.header-parent{
+  display: flex;
+    width: 100% !important;
+}
+
+.f-31{
+  font-size: 31px;
+}
+
+.blood-color{
+  color:#bb0a1e;
+}
+
+.outline-color{
+  border: 1px solid #bb0a1e !important;
+}
+
+
+.page-header{
+  padding: 2%;
+  padding-left: 4%;
+  height: 100%;
+}
+
+.f-500{
+  font-weight:500;
+}
+
+.f-30{
+  font-size:30px;
+}
+
+.f-13{
+  font-size:13px;
+}
+
+.head-text-color{
+  color: #445B88;
+}
+
+.navigation{
+  padding-top: 1.5%;
+  text-align: right;
+  font-size: 12px;
+}
+
+.mat-divider {
+  display: block;
+  margin: 0;
+  border-top-width: 1.5px;
+  border-top-style: solid;
+  color: #e0e0e0;
+}
+
+table{
+  width:100%;
+}
+
+.mat-table {
+  background: none;
+}
+
+.mat-elevation-z8 {
+  box-shadow:none;
+  
+}
+
+.horizontal-scroll-hide{
+  overflow-x: hidden;
+}
+
+
+.mat-form-field {
+  width: 100%;
+  min-width: 300px;
+}
+
+mat-card-title,
+mat-card-content {
+  display: flex;
+  justify-content: center;
+}
+
+.error {
+  padding: 16px;
+  width: 300px;
+  color: white;
+  background-color: red;
+}
+
+.button {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mat-input-element {
+  
+  background: #fff;
+}

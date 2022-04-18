@@ -1,0 +1,132 @@
+<div class="main-wrapper container-fluid m-0 p-0 horizontal-scroll-hide">
+    <div class="row">
+        <div class="col-12">
+            <mat-toolbar class="app-header">
+                <div class="header-parent">
+                    <div class="sub-head1">
+                      Blood DonorHub  <mat-icon class="f-31 blood-color">water_drop</mat-icon>
+                    </div>
+                </div>        
+              </mat-toolbar>
+        </div>
+        
+    </div>
+   
+
+    <div class="row mt-2">
+       <div class="col-sm-4 offset-4 mt-5">
+        <mat-card >
+            <mat-card-title>Register</mat-card-title>
+            <mat-card-content>
+                <form [formGroup]="registerForm" (ngSubmit)="submit()">
+                    <p>
+                        <mat-form-field>
+                        <input type="text" matInput placeholder="Name" formControlName="name"/>
+
+                        <mat-error class="form-text text-muted" 
+                            *ngIf="form['name'].touched && form['name'].errors && form['name'].errors['required']">
+                                Please enter name!
+                        </mat-error>
+                        </mat-form-field>
+                    </p>
+                    <p>
+                        <mat-form-field>
+                        <input type="email" matInput placeholder="Email" formControlName="email"/>
+                    
+                        <mat-error class="form-text text-muted" 
+                            *ngIf="form['email'].touched && form['email'].errors && form['email'].errors['required']">
+                                Please enter email!
+                            </mat-error>
+                    
+                            <mat-error class="form-text text-muted" 
+                            *ngIf="form['email'].touched && form['email'].errors && form['email'].errors['email']">
+                                Please enter valid email used while registering!
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+                    <p>
+                        <mat-form-field>
+                            <input type="text" matInput placeholder="BloodGroup" formControlName="bloodGroup"/>
+                        
+                            <mat-error class="form-text text-muted" 
+                                *ngIf="form['bloodGroup'].touched && form['bloodGroup'].errors && form['bloodGroup'].errors['required']">
+                                    Please enter bloodgroup!
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+                    <!-- <p>
+                        <mat-form-field>
+                            <input type="text" matInput placeholder="ZipCode" formControlName="zipCode"/>
+                        
+                            <mat-error class="form-text text-muted" 
+                                    *ngIf="form['zipCode'].touched && form['zipCode'].errors && form['zipCode'].errors['required']">
+                                        Please enter Zipcode!
+                            </mat-error>
+                        </mat-form-field>
+                    </p> -->
+                    
+                    <p>
+                        <mat-form-field>
+                        <input type="number" matInput placeholder="Age" formControlName="age">
+                        <mat-error class="form-text text-muted" 
+                            *ngIf="form['age'].touched && form['age'].errors && form['age'].errors['required']">
+                                Please enter Age!
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+
+                    <p>
+                        <mat-form-field>
+                        <input type="text" matInput placeholder="Gender" formControlName="gender">
+                        <mat-error class="form-text text-muted" 
+                            *ngIf="form['gender'].touched && form['gender'].errors && form['gender'].errors['required']">
+                                Please enter gender!
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+
+                    <p>
+                        <mat-form-field>
+                        <input type="text" matInput placeholder="Phone Number" formControlName="phone_number">
+                        <mat-error class="form-text text-muted" 
+                            *ngIf="form['phone_number'].touched && form['phone_number'].errors && form['phone_number'].errors['required']">
+                                Please enter Phone number!
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+
+                    <p>
+                        <mat-form-field>
+                        <input type="date" matInput placeholder="Last Donated on" formControlName="lastDonatedOn">
+                        <mat-error class="form-text text-muted" 
+                            *ngIf="form['lastDonatedOn'].touched && form['lastDonatedOn'].errors && form['lastDonatedOn'].errors['required']">
+                                Please enter last donated date!
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+
+                    <p>
+                        <mat-form-field>
+                        <input type="password" matInput placeholder="Password" formControlName="password">
+                        <mat-error class="form-text text-muted" 
+                            *ngIf="form['password'].touched && form['password'].errors && form['password'].errors['required']">
+                                Please enter password!
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+                
+                    <div class="button">
+                        <button mat-raised-button class="mr-2" color="primary" (click)="back()" mat-button>Back</button>
+                        <button mat-raised-button class="mr-2" color="primary" [disabled]="!registerForm.valid" type="submit" mat-button>Register</button>
+                    </div>
+                
+                </form>
+            </mat-card-content>
+        </mat-card>
+       </div>
+            
+      
+        
+    </div>
+</div>    
+

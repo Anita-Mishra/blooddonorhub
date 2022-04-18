@@ -1,0 +1,106 @@
+<div class="main-wrapper container-fluid m-0 p-0 horizontal-scroll-hide">
+    <div class="row">
+        <div class="col-12">
+            <mat-toolbar class="app-header">
+                <div class="header-parent">
+                    <div class="sub-head1">
+                      Blood DonorHub  <mat-icon class="f-31 blood-color">water_drop</mat-icon>
+                    </div>
+                </div>        
+              </mat-toolbar>
+        </div>
+        
+    </div>
+   
+
+    <div class="row mt-2">
+       <div class="col-sm-4 offset-4 mt-5">
+        <mat-card >
+            <mat-card-title>Request Blood</mat-card-title>
+            <mat-card-content>
+                <form [formGroup]="requestBloodForm" (ngSubmit)="submit()">
+                    <p>
+                        <mat-form-field>
+                        <input type="text" matInput placeholder="Requester Email" formControlName="requesterId"/>
+
+                        <mat-error class="form-text text-muted" 
+                            *ngIf="form['requesterId'].touched && form['requesterId'].errors && form['requesterId'].errors['required']">
+                                Please enter your email Id!
+                        </mat-error>
+                        </mat-form-field>
+                    </p>
+                    <p>
+                        <mat-form-field>
+                        <input type="text" matInput placeholder="Requester Contact Number" formControlName="requesterContactNo"/>
+                    
+                        <mat-error class="form-text text-muted" 
+                            *ngIf="form['requesterContactNo'].touched && form['requesterContactNo'].errors && form['requesterContactNo'].errors['required']">
+                                Please your enter ContactNo!
+                            </mat-error>
+                    
+                            <mat-error class="form-text text-muted" 
+                            *ngIf="form['requesterContactNo'].touched && form['requesterContactNo'].errors && form['requesterContactNo'].errors['required']">
+                                Please enter valid contact number
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+                    
+                    <p>
+                        <mat-form-field>
+                            <input type="email" matInput placeholder="Donor Email" formControlName="donorId"/>
+                        
+                            <mat-error class="form-text text-muted" 
+                                    *ngIf="form['donorId'].touched && form['donorId'].errors && form['donorId'].errors['required']">
+                                        Please enter Donor Email!
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+                    
+               
+
+                    <p>
+                        <mat-form-field>
+                        <input type="text" matInput placeholder="Donor Contact Number" formControlName="donorContactNo">
+                        <mat-error class="form-text text-muted" 
+                            *ngIf="form['donorContactNo'].touched && form['donorContactNo'].errors && form['donorContactNo'].errors['required']">
+                                Donor Contact number!
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+
+                    <p>
+                        <mat-form-field>
+                            <input type="text" matInput placeholder="BloodGroup" formControlName="bloodRequired"/>
+                        
+                            <mat-error class="form-text text-muted" 
+                                *ngIf="form['bloodRequired'].touched && form['bloodRequired'].errors && form['bloodRequired'].errors['required']">
+                                    Please enter bloodgroup!
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+
+                    <p>
+                        <mat-form-field>
+                        <input type="date" matInput placeholder="Blood Required By" formControlName="preferredDate">
+                        <mat-error class="form-text text-muted" 
+                            *ngIf="form['preferredDate'].touched && form['preferredDate'].errors && form['preferredDate'].errors['required']">
+                                Please enter last donated date!
+                            </mat-error>
+                        </mat-form-field>
+                    </p>
+
+                    <div class="button">
+                        <button mat-raised-button class="mr-2" color="primary" (click)="back()" mat-button>Back</button>
+                        <button mat-raised-button class="mr-2" color="primary" [disabled]="!requestBloodForm.valid" type="submit" mat-button>Request</button>
+                    </div>
+                
+                </form>
+            </mat-card-content>
+        </mat-card>
+       </div>
+            
+      
+        
+    </div>
+</div>    
+

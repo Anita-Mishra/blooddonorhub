@@ -1,0 +1,289 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Provisioning AWS resources for Blood Donor Hub
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: BloodDonorHub
+
+Resources:
+  #VPC Begins
+  ProjectVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: True
+      EnableDnsHostnames: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-VPC
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub igw-${ProjectName}
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref ProjectVPC
+
+  PublicSubnetEC2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ProjectVPC
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName} Public Subnet EC2
+
+  PublicSubnetBeanstalk:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ProjectVPC
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName} Public Subnet Beanstalk
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ProjectVPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName} Public Routes
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  EC2SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetEC2
+
+  BeanstalkSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetBeanstalk
+
+  PublicAccessSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref ProjectVPC
+      GroupDescription: "Allow SSH and HTTP traffic"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          CidrIp: 0.0.0.0/0
+          ToPort: 80
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
+          FromPort: 22
+          ToPort: 22
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
+          FromPort: 8001
+          ToPort: 8001
+
+  DynamoGatewayEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref ProjectVPC
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.dynamodb
+      RouteTableIds:
+        - !Ref PublicRouteTable
+  # VPC Ends
+
+  # EC2 Begins
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: projectKey
+      ImageId: ami-0c02fb55956c7d316
+      SubnetId: !Ref PublicSubnetEC2
+      SecurityGroupIds:
+        - !Ref PublicAccessSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-EC2
+  # EC2 Ends
+
+  # Elastic Beanstalk Begins
+  BeanstalkBloodDonorHub:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties:
+      Description: Blood Donor Hub frontend
+  BeanstalkBloodDonorHubVersion:
+    Type: AWS::ElasticBeanstalk::ApplicationVersion
+    Properties:
+      ApplicationName:
+        Ref: BeanstalkBloodDonorHub
+      Description: Blood Donor Hub version 1
+      SourceBundle:
+        S3Bucket: blooddonorhubfinal
+        S3Key: docker-compose.yml
+  BeanStalkConfigurationTemplate:
+    Type: AWS::ElasticBeanstalk::ConfigurationTemplate
+    Properties:
+      ApplicationName:
+        Ref: BeanstalkBloodDonorHub
+      SolutionStackName: "64bit Amazon Linux 2 v3.4.13 running Docker"
+      OptionSettings:
+        - Namespace: aws:autoscaling:asg
+          OptionName: MinSize
+          Value: "2"
+        - Namespace: aws:autoscaling:asg
+          OptionName: MaxSize
+          Value: "3"
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: EnvironmentType
+          Value: LoadBalanced
+        - Namespace: aws:ec2:vpc
+          OptionName: VPCId
+          Value: !Ref ProjectVPC
+        - Namespace: aws:ec2:vpc
+          OptionName: Subnets
+          Value: !Ref PublicSubnetBeanstalk
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: IamInstanceProfile
+          Value: LabInstanceProfile
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: EC2KeyName
+          Value: projectKey
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: InstanceType
+          Value: t2.medium
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: SecurityGroups
+          Value: !Ref PublicAccessSecurityGroup
+  DevEnvironment:
+    Type: AWS::ElasticBeanstalk::Environment
+    Properties:
+      ApplicationName:
+        Ref: BeanstalkBloodDonorHub
+      Description: Dev environment
+      TemplateName:
+        Ref: BeanStalkConfigurationTemplate
+      VersionLabel:
+        Ref: BeanstalkBloodDonorHubVersion
+  # Elastic Beanstalk Ends
+
+  # DynamoDB Begins
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "email"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "email"
+          KeyType: "HASH"
+      TableName: "user"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+
+  RequestsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "requestId"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "requestId"
+          KeyType: "HASH"
+      TableName: "requests"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+  # DynamoDB Ends
+
+  #Cognito Begins
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: "SaiyansPool"
+      UsernameAttributes:
+        - email
+      UsernameConfiguration:
+        CaseSensitive: False
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+          - Name: verified_phone_number
+            Priority: 2
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: False
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: True
+          RequireUppercase: True
+          RequireSymbols: True
+          RequireNumbers: True
+      Schema:
+        - AttributeDataType: "String"
+          Mutable: False
+          Name: "name"
+          Required: True
+        - AttributeDataType: "String"
+          Mutable: False
+          Name: "gender"
+          Required: True
+        - AttributeDataType: "String"
+          Mutable: False
+          Name: "email"
+          Required: True
+        - AttributeDataType: "String"
+          Mutable: False
+          Name: "phone_number"
+          Required: True
+        - AttributeDataType: "String"
+          Mutable: False
+          Name: "bloodGroup"
+          StringAttributeConstraints:
+            MinLength: 2
+            MaxLength: 3
+      AutoVerifiedAttributes:
+        - email
+      VerificationMessageTemplate:
+        DefaultEmailOption: "CONFIRM_WITH_LINK"
+  CognitoClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: cognito-client
+      GenerateSecret: False
+      UserPoolId: !Ref CognitoUserPool
+      RefreshTokenValidity: 30 # days
+      AccessTokenValidity: 1 # hours
+      IdTokenValidity: 1 # hours
+      SupportedIdentityProviders:
+        - COGNITO
+      ExplicitAuthFlows:
+        - ALLOW_CUSTOM_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      PreventUserExistenceErrors: ENABLED
+      EnableTokenRevocation: True
+  CognitoDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: blood-donor-hub
+      UserPoolId: !Ref CognitoUserPool
+  # Cognito Ends
